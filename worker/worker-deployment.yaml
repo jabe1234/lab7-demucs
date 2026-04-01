@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      containers:
+      - name: worker
+        image: jabe1234/demucs-worker:latest
+        command: ["python3", "-u"]
+        args: ["worker-server.py"]
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+        env:
+        - name: REDIS_HOST
+          value: "redis"
+        volumeMounts:
+        - mountPath: /data
+          name: shared-data
+        - mountPath: /output
+          name: output-data
+      volumes:
+      - name: shared-data
+        emptyDir: {}
+      - name: output-data
+        emptyDir: {}
